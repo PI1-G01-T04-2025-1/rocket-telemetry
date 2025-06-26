@@ -11,6 +11,21 @@ const compat = new FlatCompat({
 
 const eslintConfig = [
   ...compat.extends("next/core-web-vitals", "next/typescript"),
+  {
+    ignores: [
+      '.next/*',
+      'node_modules/*',
+      '.husky/*'
+    ]
+  },
+  {
+    rules: {
+      "google-font-display": "warning",
+      "google-font-preconnect": "warning",
+      "inline-script-id": "error",
+      "import/no-anonymous-default-export": "off"
+    }
+  }
 ];
 
 export default eslintConfig;

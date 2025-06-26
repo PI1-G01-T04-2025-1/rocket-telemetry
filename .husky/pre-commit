@@ -1,0 +1,2 @@
+echo "RUNNING LINT"
+npm run lint-staged

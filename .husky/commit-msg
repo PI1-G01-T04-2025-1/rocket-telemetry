@@ -1,0 +1,2 @@
+echo "RUNNING COMMIT MSG"
+npx --no-install commitlint --edit "$1"
