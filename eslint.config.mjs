@@ -20,9 +20,9 @@ const eslintConfig = [
   },
   {
     rules: {
-      "google-font-display": "warning",
-      "google-font-preconnect": "warning",
-      "inline-script-id": "error",
+      "@next/next/google-font-display": "warn",
+      "@next/next/google-font-preconnect": "warn",
+      "@next/next/inline-script-id": "error",
       "import/no-anonymous-default-export": "off"
     }
   }

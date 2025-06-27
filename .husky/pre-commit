@@ -1,2 +1,2 @@
 echo "RUNNING LINT"
-npm run lint-staged
+npm run lint-staged --concurrent false
