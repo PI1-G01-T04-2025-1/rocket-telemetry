@@ -1,25 +1,3 @@
-# Oásis Rocket Telemetry System
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-Perfeito! Abaixo está o `README.md` completo em Markdown, estruturado exatamente como aparece nas suas imagens: com **títulos**, **emojis**, **passo a passo**, **blocos de código** e tudo muito bem formatado.
-
----
-
-```markdown
 # 🚀 Oásis Rocket Telemetry System
 
 Sistema de visualização de telemetria para foguetes desenvolvido com Next.js e TypeScript.
@@ -63,7 +41,7 @@ src/
 ```bash
 git clone https://github.com/seu-usuario/rocket-telemetry.git
 cd rocket-telemetry
-````
+```
 
 ### 📦 2. Instale as dependências
 
