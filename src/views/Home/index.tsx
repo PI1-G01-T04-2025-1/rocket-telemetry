@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { CreateRocketLaunchDialog, RocketLaunchesTable } from '@/components';
 
 export const HomeView = () => {
   return (
@@ -8,9 +8,18 @@ export const HomeView = () => {
           Oasis Rocket
         </h1>
         <nav>
-          <Button>Hello World!</Button>
+          <CreateRocketLaunchDialog />
         </nav>
       </div>
+
+      <section className='mt-8'>
+        <h2 className='scroll-m-20 border-b pb-2 text-3xl font-bold tracking-tight first:mt-0'>
+          Relatório de Lançamentos
+        </h2>
+        <div className='mt-4'>
+          <RocketLaunchesTable />
+        </div>
+      </section>
     </div>
   );
 };

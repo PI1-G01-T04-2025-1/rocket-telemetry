@@ -15,7 +15,8 @@ const eslintConfig = [
     ignores: [
       '.next/*',
       'node_modules/*',
-      '.husky/*'
+      '.husky/*',
+      'generated/*',
     ]
   },
   {

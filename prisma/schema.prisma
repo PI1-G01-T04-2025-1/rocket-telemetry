@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Rocket {
+  id       Int      @id @default(autoincrement())
+  nome     String   @unique
+  peso_zfw Float
+  Launch   Launch[]
+
+  @@map("foguete")
+}
+
+model Launch {
+  id        Int      @id @default(autoincrement())
+  fogueteId Int      @map("foguete_id")
+  dataHora  DateTime @default(now()) @map("datahora")
+  angulo    Float    @default(45.0)
+  pressao   Float    @default(0)
+  qtdAgua   Float    @default(0) @map("qtd_agua")
+
+
+  foguete         Rocket         @relation(fields: [fogueteId], references: [id])
+  dados_coletados ColectedData[]
+
+  @@map("lancamento")
+}
+
+model ColectedData {
+  id           Int      @id @default(autoincrement())
+  lancamentoId Int      @map("lancamento_id")
+  rawData      String   @map("raw_data")
+  dataHora     DateTime @default(now()) @map("datahora")
+
+  lancamento Launch @relation(fields: [lancamentoId], references: [id])
+
+  @@map("dadocoletado")
+}
