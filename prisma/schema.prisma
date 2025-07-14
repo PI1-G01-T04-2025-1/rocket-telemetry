@@ -9,10 +9,10 @@ datasource db {
 }
 
 model Rocket {
-  id       Int      @id @default(autoincrement())
-  nome     String   @unique
-  peso_zfw Float
-  Launch   Launch[]
+  id          Int      @id @default(autoincrement())
+  nome        String   @unique
+  peso_zfw    Float
+  lancamentos Launch[]
 
   @@map("foguete")
 }
@@ -24,7 +24,6 @@ model Launch {
   angulo    Float    @default(45.0)
   pressao   Float    @default(0)
   qtdAgua   Float    @default(0) @map("qtd_agua")
-
 
   foguete         Rocket         @relation(fields: [fogueteId], references: [id])
   dados_coletados ColectedData[]

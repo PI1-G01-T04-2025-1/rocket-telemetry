@@ -45,6 +45,7 @@ import {
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import { Button } from './ui/button';
+import { RocketLaunchesResponse } from '@/services/rocket/get-launches';
 
 declare module '@tanstack/react-table' {
   interface ColumnMeta<TData extends RowData, TValue> {
@@ -155,7 +156,11 @@ const items: Item[] = [
   },
 ];
 
-export function RocketLaunchesTable() {
+interface IProps {
+  data: Item[];
+}
+
+export function RocketLaunchesTable({ data }: IProps) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [sorting, setSorting] = useState<SortingState>([
     {
@@ -165,7 +170,7 @@ export function RocketLaunchesTable() {
   ]);
 
   const table = useReactTable({
-    data: items,
+    data,
     columns,
     state: {
       sorting,
