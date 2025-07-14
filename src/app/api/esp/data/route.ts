@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { espService } from '@/lib/esp-communication';
+import { GPGPADto } from '@/lib/telemetry-calculator/utils';
 
 export async function GET() {
   try {
@@ -7,7 +8,11 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
-      data,
+      data: data.records.map((item: { t: number; g: string }) => ({
+        t: item.t,
+        g: item.g,
+        formated: GPGPADto(item.g),
+      })),
       timestamp: new Date().toISOString(),
     });
   } catch (error) {

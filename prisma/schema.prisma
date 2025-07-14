@@ -18,12 +18,13 @@ model Rocket {
 }
 
 model Launch {
-  id        Int      @id @default(autoincrement())
-  fogueteId Int      @map("foguete_id")
-  dataHora  DateTime @default(now()) @map("datahora")
-  angulo    Float    @default(45.0)
-  pressao   Float    @default(0)
-  qtdAgua   Float    @default(0) @map("qtd_agua")
+  id                Int      @id @default(autoincrement())
+  fogueteId         Int      @map("foguete_id")
+  dataHora          DateTime @default(now()) @map("datahora")
+  angulo            Float    @default(45.0)
+  pressao           Float    @default(0)
+  qtdAgua           Float    @default(0) @map("qtd_agua")
+  distanciaEsperada Float    @map("distancia_esperada") @default(0)
 
   foguete         Rocket         @relation(fields: [fogueteId], references: [id])
   dados_coletados ColectedData[]
@@ -32,10 +33,15 @@ model Launch {
 }
 
 model ColectedData {
-  id           Int      @id @default(autoincrement())
-  lancamentoId Int      @map("lancamento_id")
-  rawData      String   @map("raw_data")
-  dataHora     DateTime @default(now()) @map("datahora")
+  id              Int    @id @default(autoincrement())
+  lancamentoId    Int    @map("lancamento_id")
+  distancia       Float?
+  tempoDePercurso Float? @map("tempo_de_percurso")
+  velocidadeMedia Float? @map("velocidade_media")
+  alturaMaxima    Float? @map("altura_maxima")
+
+  rawData  String   @map("raw_data")
+  dataHora DateTime @default(now()) @map("datahora")
 
   lancamento Launch @relation(fields: [lancamentoId], references: [id])
 

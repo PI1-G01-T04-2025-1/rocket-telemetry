@@ -17,8 +17,8 @@ export const HomeView = () => {
     return data.map((launch) => ({
       id: launch.id,
       details: launch.id,
-      distance: -1,
-      averageSpeed: -1,
+      distance: launch.expectedDistance,
+      water: launch.water,
       pressure: launch.pressure,
       date: launch.createdAt,
     }));

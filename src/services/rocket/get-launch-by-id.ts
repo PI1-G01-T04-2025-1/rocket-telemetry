@@ -1,12 +1,15 @@
 import { api } from '@/lib/http';
 
-export interface Response {
+export type Response = Launch;
+
+export interface Launch {
   id: number;
   rocketId: number;
   rocket: Rocket;
   angle: number;
   pressure: number;
   water: number;
+  expectedDistance: number;
   collectedData: CollectedData;
   createdAt: string;
 }
@@ -20,6 +23,10 @@ export interface Rocket {
 export interface CollectedData {
   id: number;
   rawData: string;
+  distance: number | null;
+  maxAltitude: number | null;
+  averageSpeed: number | null;
+  timeToReach: number | null;
 }
 
 export const getLaunch = async ({

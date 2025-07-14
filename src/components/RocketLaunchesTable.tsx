@@ -56,7 +56,7 @@ declare module '@tanstack/react-table' {
 type Item = {
   id: string;
   distance: number;
-  averageSpeed: number;
+  water: number;
   pressure: number;
   date: string;
   details: string;
@@ -69,17 +69,17 @@ const columns: ColumnDef<Item>[] = [
     cell: ({ row }) => <div className='font-medium'>{row.getValue('id')}</div>,
   },
   {
-    header: 'Velocidade média',
-    accessorKey: 'averageSpeed',
+    header: 'Qtd. água (ml)',
+    accessorKey: 'water',
     cell: ({ row }) => (
-      <div className='font-medium'>{row.getValue('averageSpeed')}</div>
+      <div className='font-medium'>{row.getValue('water')}</div>
     ),
     meta: {
       filterVariant: 'range',
     },
   },
   {
-    header: 'Distancia',
+    header: 'Distancia (m)',
     accessorKey: 'distance',
     cell: ({ row }) => {
       return <div className='flex gap-1'>{row.getValue('distance')}</div>;
@@ -94,7 +94,7 @@ const columns: ColumnDef<Item>[] = [
     },
   },
   {
-    header: 'Pressão',
+    header: 'Pressão (psi)',
     accessorKey: 'pressure',
     cell: ({ row }) => {
       return row.getValue('pressure');
@@ -126,33 +126,6 @@ const columns: ColumnDef<Item>[] = [
       </Button>
     ),
     enableSorting: false,
-  },
-];
-
-const items: Item[] = [
-  {
-    id: '1',
-    averageSpeed: 120,
-    distance: 10,
-    pressure: 1.2,
-    date: new Date().toISOString(),
-    details: '1',
-  },
-  {
-    id: '2',
-    averageSpeed: 121,
-    distance: 20,
-    pressure: 0.7,
-    date: new Date().toISOString(),
-    details: '1',
-  },
-  {
-    id: '3',
-    averageSpeed: 122,
-    distance: 30,
-    pressure: 1,
-    date: new Date().toISOString(),
-    details: '1',
   },
 ];
 
@@ -198,7 +171,7 @@ export function RocketLaunchesTable({ data }: IProps) {
           <Filter column={table.getColumn('distance')!} />
         </div>
         <div className='w-36'>
-          <Filter column={table.getColumn('averageSpeed')!} />
+          <Filter column={table.getColumn('water')!} />
         </div>
         <div className='w-36'>
           <Filter column={table.getColumn('pressure')!} />

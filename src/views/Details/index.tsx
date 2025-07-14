@@ -75,30 +75,30 @@ export const DetailsView = () => {
       </div>
 
       {isFetching ? (
-        <>
-          <div className='mt-8 grid grid-cols-12 gap-4'>
-            <Skeleton className='col-span-3 h-28' />
-            <Skeleton className='col-span-3 h-28' />
-            <Skeleton className='col-span-3 h-28' />
-            <Skeleton className='col-span-3 h-28' />
-            <Skeleton className='col-span-3 h-28' />
-            <Skeleton className='col-span-3 h-28' />
-            <Skeleton className='col-span-3 h-28' />
-            <Skeleton className='col-span-3 h-28' />
-          </div>
-          <div className='mt-8 grid grid-cols-12 gap-4'>
-            <Skeleton className='col-span-4 h-[300px]' />
-            <Skeleton className='col-span-4 h-[300px]' />
-            <Skeleton className='col-span-4 h-[300px]' />
-          </div>
-        </>
+        <DataSkeleton />
       ) : (
         <>
           <section className='mt-8 grid grid-cols-12 gap-4'>
-            <CardSampleInfo title='Distância percorrida' value='20 metros' />
-            <CardSampleInfo title='Pressão' value='1.2psi' />
-            <CardSampleInfo title='Velocidade média' value='2m/s' />
-            <CardSampleInfo title='Tempo de percurso' value='10s' />
+            <CardSampleInfo
+              title='Distância esperada'
+              value={`${data?.expectedDistance}m`}
+            />
+            <CardSampleInfo
+              title='Distância percorrida'
+              value={`${data?.collectedData.distance?.toFixed(2) || 0}m`}
+            />
+            <CardSampleInfo
+              title='Pressão'
+              value={`${data?.pressure || 0}psi`}
+            />
+            <CardSampleInfo
+              title='Velocidade média'
+              value={`${data?.collectedData.averageSpeed?.toFixed(2) || 0}m/s`}
+            />
+            <CardSampleInfo
+              title='Tempo de percurso'
+              value={`${data?.collectedData.timeToReach || 0}s`}
+            />
             <CardSampleInfo
               title='Quantidade de água'
               value={`${data?.water || 0}ml`}
@@ -171,5 +171,27 @@ const CardSampleInfo = ({ title, value }: { title: string; value: string }) => {
         <h3 className='text-center text-3xl font-semibold'>{value}</h3>
       </CardContent>
     </Card>
+  );
+};
+
+const DataSkeleton = () => {
+  return (
+    <>
+      <div className='mt-8 grid grid-cols-12 gap-4'>
+        <Skeleton className='col-span-3 h-28' />
+        <Skeleton className='col-span-3 h-28' />
+        <Skeleton className='col-span-3 h-28' />
+        <Skeleton className='col-span-3 h-28' />
+        <Skeleton className='col-span-3 h-28' />
+        <Skeleton className='col-span-3 h-28' />
+        <Skeleton className='col-span-3 h-28' />
+        <Skeleton className='col-span-3 h-28' />
+      </div>
+      <div className='mt-8 grid grid-cols-12 gap-4'>
+        <Skeleton className='col-span-4 h-[300px]' />
+        <Skeleton className='col-span-4 h-[300px]' />
+        <Skeleton className='col-span-4 h-[300px]' />
+      </div>
+    </>
   );
 };

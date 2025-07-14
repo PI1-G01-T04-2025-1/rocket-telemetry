@@ -29,6 +29,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
 import SuccessCreatedDialog from './SuccessCreatedDialog';
 import { useDisclose } from '@/hooks';
+import { queryClient } from '@/lib';
+import { useMutation } from '@tanstack/react-query';
+import { createRocketLaunch } from '@/services/rocket/create-launch';
 
 const schema = z.object({
   distance: z.coerce
@@ -55,14 +58,35 @@ export function CreateRocketLaunchDialog() {
     resolver: zodResolver(schema),
   });
 
+  const mutation = useMutation({
+    mutationFn: createRocketLaunch,
+  });
+
   const onSubmit: SubmitHandler<Schema> = (data) => {
-    console.log(data);
-    setSuccessDialogOpen(true);
+    mutation.mutate(
+      {
+        rocketId: '1',
+        expectedDistance: data.distance,
+        pressure: data.pressure,
+        water: data.water,
+      },
+      {
+        onSuccess: () => {
+          setSuccessDialogOpen(true);
+        },
+        onError: (error) => {
+          alert(error);
+        },
+      },
+    );
   };
 
   const handleSuccessDialogClose = () => {
     if (setSuccessDialogOpen) setSuccessDialogOpen(false);
     reset();
+    queryClient.invalidateQueries({
+      queryKey: ['rocketLaunches'],
+    });
     onClose();
   };
 
@@ -71,7 +95,6 @@ export function CreateRocketLaunchDialog() {
       <SuccessCreatedDialog
         open={successDialogOpen}
         handleRequestClose={handleSuccessDialogClose}
-        onAction={() => alert('oi')}
       />
       <Dialog
         open={isOpen}
@@ -211,6 +234,7 @@ export function CreateRocketLaunchDialog() {
                 onClick={() => {
                   reset();
                 }}
+                disabled={!mutation.isIdle}
               >
                 Cancelar
               </Button>
@@ -219,6 +243,7 @@ export function CreateRocketLaunchDialog() {
               type='submit'
               className='cursor-pointer'
               onClick={handleSubmit(onSubmit)}
+              isLoading={mutation.isPending}
             >
               Criar
             </Button>

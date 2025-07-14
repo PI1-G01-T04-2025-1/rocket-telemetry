@@ -17,6 +17,10 @@ export async function GET(
       dados_coletados: {
         select: {
           id: true,
+          alturaMaxima: true,
+          distancia: true,
+          tempoDePercurso: true,
+          velocidadeMedia: true,
           rawData: true,
         },
       },
@@ -47,10 +51,15 @@ export async function GET(
       angle: data.angulo,
       pressure: data.pressao,
       water: data.qtdAgua,
+      expectedDistance: data.distanciaEsperada,
       collectedData:
         data.dados_coletados.length > 0
           ? {
               id: data.dados_coletados[0].id,
+              distance: data.dados_coletados[0].distancia,
+              maxAltitude: data.dados_coletados[0].alturaMaxima,
+              averageSpeed: data.dados_coletados[0].velocidadeMedia,
+              timeToReach: data.dados_coletados[0].tempoDePercurso,
               rawData: data.dados_coletados[0].rawData,
             }
           : null,

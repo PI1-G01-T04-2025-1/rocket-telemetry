@@ -11,5 +11,6 @@ export const useLaunchData = ({
   return useQuery({
     queryKey: ['launch', rocketId, launchId],
     queryFn: () => getLaunch({ rocketId, launchId }),
+    refetchOnWindowFocus: false,
   });
 };

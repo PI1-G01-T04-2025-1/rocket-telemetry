@@ -14,6 +14,7 @@ interface Launch {
   angulo: number;
   pressao: number;
   qtdAgua: number;
+  distanciaEsperada: number;
 }
 
 export const getLaunches = async ({
@@ -43,6 +44,7 @@ const dto = (response: Response) => {
       angle: launch.angulo,
       pressure: launch.pressao,
       water: launch.qtdAgua,
+      expectedDistance: launch.distanciaEsperada,
       createdAt: launch.dataHora,
     })),
   };
