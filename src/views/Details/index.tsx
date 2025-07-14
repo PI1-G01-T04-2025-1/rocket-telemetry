@@ -5,10 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ChevronLeftIcon } from 'lucide-react';
 import { useParams, useRouter } from 'next/navigation';
 import { ChartLineDots } from './LineChart';
+import { useLaunchData } from '@/hooks/react-query/useLaunchData';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export const DetailsView = () => {
   const router = useRouter();
   const { id } = useParams();
+  const { data, isFetching } = useLaunchData({
+    rocketId: String(1),
+    launchId: String(id),
+  });
 
   const altitude = [
     { time: 0, altitude: 0 },
@@ -49,74 +55,108 @@ export const DetailsView = () => {
           >
             <ChevronLeftIcon />
           </Button>
-          <h2 className='text-2xl font-semibold tracking-tight'>
-            Lançamento #{id}
-          </h2>
+          {isFetching ? (
+            <Skeleton className='h-8 w-36' />
+          ) : (
+            <h2 className='text-2xl font-semibold tracking-tight'>
+              Lançamento #{id} - {data?.rocket.name || 'Rocket Name'}
+            </h2>
+          )}
         </div>
-        <div>
-          <Button variant='destructive' size='sm'>
-            Excluir Lançamento
-          </Button>
-        </div>
+        {isFetching ? (
+          <Skeleton className='h-8 w-36' />
+        ) : (
+          <div>
+            <Button variant='destructive' size='sm'>
+              Excluir Lançamento
+            </Button>
+          </div>
+        )}
       </div>
 
-      <section className='mt-8 grid grid-cols-12 gap-4'>
-        <CardSampleInfo title='Distância percorrida' value='20 metros' />
-        <CardSampleInfo title='Pressão' value='1.2psi' />
-        <CardSampleInfo title='Velocidade média' value='2m/s' />
-        <CardSampleInfo title='Tempo de percurso' value='10s' />
-      </section>
+      {isFetching ? (
+        <>
+          <div className='mt-8 grid grid-cols-12 gap-4'>
+            <Skeleton className='col-span-3 h-28' />
+            <Skeleton className='col-span-3 h-28' />
+            <Skeleton className='col-span-3 h-28' />
+            <Skeleton className='col-span-3 h-28' />
+            <Skeleton className='col-span-3 h-28' />
+            <Skeleton className='col-span-3 h-28' />
+            <Skeleton className='col-span-3 h-28' />
+            <Skeleton className='col-span-3 h-28' />
+          </div>
+          <div className='mt-8 grid grid-cols-12 gap-4'>
+            <Skeleton className='col-span-4 h-[300px]' />
+            <Skeleton className='col-span-4 h-[300px]' />
+            <Skeleton className='col-span-4 h-[300px]' />
+          </div>
+        </>
+      ) : (
+        <>
+          <section className='mt-8 grid grid-cols-12 gap-4'>
+            <CardSampleInfo title='Distância percorrida' value='20 metros' />
+            <CardSampleInfo title='Pressão' value='1.2psi' />
+            <CardSampleInfo title='Velocidade média' value='2m/s' />
+            <CardSampleInfo title='Tempo de percurso' value='10s' />
+            <CardSampleInfo
+              title='Quantidade de água'
+              value={`${data?.water || 0}ml`}
+            />
+          </section>
 
-      <section className='mt-8 grid grid-cols-12 gap-4'>
-        <ChartLineDots
-          title='Altitude em relação ao tempo'
-          description='Gráfico de altitude em relação ao tempo'
-          chartData={altitude}
-          dataKey='altitude'
-          xAxisDataKey='time'
-          xAxisTickFormatter={(value: number) => `${value}s`}
-          yAxisDataKey='altitude'
-          yAxisTickFormatter={(value: number) => `${value}m`}
-          chartConfig={{
-            altitude: {
-              color: 'var(--chart-1)',
-              label: 'Altitude',
-            },
-          }}
-        />
-        <ChartLineDots
-          title='Trajetória GPS'
-          description='Gráfico da trajetória GPS do lançamento 2D (latitude e longitude)'
-          chartData={trajectoryData}
-          dataKey='lat'
-          xAxisDataKey='lon'
-          // xAxisTickFormatter={(value: number) => `${value}s`}
-          yAxisDataKey='lat'
-          // yAxisTickFormatter={(value: number) => `${value}m`}
-          chartConfig={{
-            lat: {
-              color: 'var(--chart-5)',
-              label: 'Latitude',
-            },
-          }}
-        />
-        <ChartLineDots
-          title='Altitude em relação ao tempo'
-          description='Gráfico de altitude em relação ao tempo'
-          chartData={altitude}
-          dataKey='altitude'
-          xAxisDataKey='time'
-          xAxisTickFormatter={(value: number) => `${value}s`}
-          yAxisDataKey='altitude'
-          yAxisTickFormatter={(value: number) => `${value}m`}
-          chartConfig={{
-            altitude: {
-              color: 'var(--chart-3)',
-              label: 'Altitude',
-            },
-          }}
-        />
-      </section>
+          <section className='mt-8 grid grid-cols-12 gap-4'>
+            <ChartLineDots
+              title='Altitude em relação ao tempo'
+              description='Gráfico de altitude em relação ao tempo'
+              chartData={altitude}
+              dataKey='altitude'
+              xAxisDataKey='time'
+              xAxisTickFormatter={(value: number) => `${value}s`}
+              yAxisDataKey='altitude'
+              yAxisTickFormatter={(value: number) => `${value}m`}
+              chartConfig={{
+                altitude: {
+                  color: 'var(--chart-1)',
+                  label: 'Altitude',
+                },
+              }}
+            />
+            <ChartLineDots
+              title='Trajetória GPS'
+              description='Gráfico da trajetória GPS do lançamento 2D (latitude e longitude)'
+              chartData={trajectoryData}
+              dataKey='lat'
+              xAxisDataKey='lon'
+              // xAxisTickFormatter={(value: number) => `${value}s`}
+              yAxisDataKey='lat'
+              // yAxisTickFormatter={(value: number) => `${value}m`}
+              chartConfig={{
+                lat: {
+                  color: 'var(--chart-5)',
+                  label: 'Latitude',
+                },
+              }}
+            />
+            <ChartLineDots
+              title='Altitude em relação ao tempo'
+              description='Gráfico de altitude em relação ao tempo'
+              chartData={altitude}
+              dataKey='altitude'
+              xAxisDataKey='time'
+              xAxisTickFormatter={(value: number) => `${value}s`}
+              yAxisDataKey='altitude'
+              yAxisTickFormatter={(value: number) => `${value}m`}
+              chartConfig={{
+                altitude: {
+                  color: 'var(--chart-3)',
+                  label: 'Altitude',
+                },
+              }}
+            />
+          </section>
+        </>
+      )}
     </div>
   );
 };
