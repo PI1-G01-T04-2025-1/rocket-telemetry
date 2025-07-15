@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, {
   AxiosInstance,
   AxiosRequestConfig,
@@ -13,10 +14,10 @@ export class ESPCommunicationService {
 
   constructor(
     // Descomente a linha abaixo para usar o IP do ESP!!!
-    // baseURL: string = 'http://192.168.4.1',
+    baseURL: string = 'http://192.168.4.1',
 
     // Comente a linha abaixo ao usar o IP do ESP
-    baseURL: string = 'http://localhost:8080',
+    // baseURL: string = 'http://localhost:8080',
 
     maxRetries: number = 3,
     retryDelay: number = 1000,

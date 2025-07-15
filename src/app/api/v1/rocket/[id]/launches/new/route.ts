@@ -1,5 +1,5 @@
 import { prisma } from '@/lib';
-import { espService } from '@/lib/esp-communication';
+// import { espService } from '@/lib/esp-communication';
 import {
   calculateAverageSpeed,
   diferenceInSeconds,
@@ -8,6 +8,8 @@ import {
   totalDistance,
 } from '@/lib/telemetry-calculator/utils';
 import { NextResponse } from 'next/server';
+import espData from '../../../../../../../../data.json';
+
 export async function POST(
   req: Request,
   { params }: { params: Promise<{ id: string }> },
@@ -16,7 +18,7 @@ export async function POST(
 
   const body = await req.json();
 
-  const espData = await espService.fetchTelemetryData();
+  // const espData = await espService.fetchTelemetryData();
 
   if (!espData) {
     return NextResponse.json(
@@ -80,6 +82,7 @@ export async function POST(
       tempoDePercurso: totalTime,
       velocidadeMedia:
         calculateAverageSpeed(rocketTotalDistance, totalTime) || 0,
+      dadosFormatados: JSON.stringify(espFormatedData),
       lancamento: {
         connect: {
           id: data.id,
