@@ -1,46 +1,61 @@
 import { NextResponse } from 'next/server';
-import { espService } from '@/lib/esp-communication';
-import { GPGPADto } from '@/lib/telemetry-calculator/utils';
+import http from 'http';
+import https from 'https';
 
 export async function GET() {
-  try {
-    const data = await espService.fetchTelemetryData();
+  const url = 'http://localhost:8080/data.json'; // Alterar para http://192.168.4.1/data.json
+  const isHttps = url.startsWith('https://');
+  const client = isHttps ? https : http;
 
-    return NextResponse.json({
-      success: true,
-      data: data.records.map((item: { t: number; g: string }) => ({
-        t: item.t,
-        g: item.g,
-        formated: GPGPADto(item.g),
-      })),
-      timestamp: new Date().toISOString(),
+  return new Promise((resolve) => {
+    const req = client.get(url, (res) => {
+      let data = Buffer.alloc(0);
+
+      res.on('data', (chunk) => {
+        data = Buffer.concat([data, chunk]);
+      });
+
+      res.on('end', () => {
+        let parsed = null;
+        try {
+          parsed = JSON.parse(data.toString());
+        } catch (e) {
+        }
+        resolve(
+          NextResponse.json({
+            success: true,
+            message: 'Dados recebidos',
+            data: parsed || data.toString(),
+            raw: data.toString(),
+            length: data.length,
+            timestamp: new Date().toISOString(),
+          })
+        );
+      });
+
+      res.on('error', (err) => {
+        resolve(
+          NextResponse.json({
+            success: false,
+            message: 'Erro ao receber dados',
+            error: err.message,
+            length: data.length,
+            partial: data.toString(),
+            timestamp: new Date().toISOString(),
+          })
+        );
+      });
     });
-  } catch (error) {
-    console.error('Erro ao buscar dados do ESP:', error);
 
-    if (error instanceof Error) {
-      const errorMessage = error.message.toLowerCase();
-      if (
-        errorMessage.includes('econnreset') ||
-        errorMessage.includes('connection reset') ||
-        errorMessage.includes('connection reset by peer')
-      ) {
-        return NextResponse.json({
-          success: true,
-          message: 'Dados recebidos (conexão resetada)',
-          data: null,
+    req.on('error', (err) => {
+      resolve(
+        NextResponse.json({
+          success: false,
+          message: 'Erro na requisição',
+          error: err.message,
           timestamp: new Date().toISOString(),
-        });
-      }
-    }
-
-    return NextResponse.json(
-      {
-        success: false,
-        error: (error as Error).message,
-        timestamp: new Date().toISOString(),
-      },
-      { status: 500 },
-    );
-  }
+        })
+      );
+    });
+  });
 }
