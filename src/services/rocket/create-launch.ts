@@ -19,7 +19,6 @@ export const createRocketLaunch = async ({
       water,
     });
   } catch (error) {
-    console.error('Error creating rocket launch:', error);
     throw error;
   }
 };
