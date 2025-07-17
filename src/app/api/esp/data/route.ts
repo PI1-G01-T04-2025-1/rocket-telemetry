@@ -1,46 +1,30 @@
 import { NextResponse } from 'next/server';
-import { espService } from '@/lib/esp-communication';
-import { GPGPADto } from '@/lib/telemetry-calculator/utils';
 
 export async function GET() {
+  const url = 'http://localhost:8080/data.json';
+
   try {
-    const data = await espService.fetchTelemetryData();
+    const res = await fetch(url);
+    const text = await res.text();
+
+    let parsed = null;
+    try {
+      parsed = JSON.parse(text);
+    } catch (_) {}
 
     return NextResponse.json({
       success: true,
-      data: data.records.map((item: { t: number; g: string }) => ({
-        t: item.t,
-        g: item.g,
-        formated: GPGPADto(item.g),
-      })),
+      message: 'Dados recebidos com sucesso',
+      data: parsed || text,
+      raw: text,
       timestamp: new Date().toISOString(),
     });
-  } catch (error) {
-    console.error('Erro ao buscar dados do ESP:', error);
-
-    if (error instanceof Error) {
-      const errorMessage = error.message.toLowerCase();
-      if (
-        errorMessage.includes('econnreset') ||
-        errorMessage.includes('connection reset') ||
-        errorMessage.includes('connection reset by peer')
-      ) {
-        return NextResponse.json({
-          success: true,
-          message: 'Dados recebidos (conexão resetada)',
-          data: null,
-          timestamp: new Date().toISOString(),
-        });
-      }
-    }
-
-    return NextResponse.json(
-      {
-        success: false,
-        error: (error as Error).message,
-        timestamp: new Date().toISOString(),
-      },
-      { status: 500 },
-    );
+  } catch (error: any) {
+    return NextResponse.json({
+      success: false,
+      message: 'Erro ao buscar dados',
+      error: error.message,
+      timestamp: new Date().toISOString(),
+    });
   }
 }
