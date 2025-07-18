@@ -37,3 +37,16 @@ describe('CT08 - Detalhes do lançamento', () => {
     expect(screen.getByText(/2.5psi/i)).toBeInTheDocument();
   });
 });
+
+describe('CT05 - Validar coleta de dados do ESP (mock)', () => {
+  it('deve exibir os dados coletados do ESP corretamente', async () => {
+    render(<DetailsView />);
+    // Verifica se os dados coletados aparecem na tela
+    expect(screen.getByText(/Distância percorrida/i)).toBeInTheDocument();
+    expect(screen.getByText(/120.50m/i)).toBeInTheDocument();
+    expect(screen.getByText(/Velocidade média/i)).toBeInTheDocument();
+    expect(screen.getByText(/40/i)).toBeInTheDocument();
+    expect(screen.getByText(/Tempo de percurso/i)).toBeInTheDocument();
+    expect(screen.getByText(/6/i)).toBeInTheDocument();
+  });
+});
