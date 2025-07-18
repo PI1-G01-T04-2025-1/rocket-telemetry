@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
+import React from 'react';
 
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from 'recharts';
 
