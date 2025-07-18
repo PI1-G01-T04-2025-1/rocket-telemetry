@@ -1,5 +1,7 @@
 import { NextResponse } from 'next/server';
 
+console.log('ESP_BASE_URL:', process.env.ESP_BASE_URL);
+
 export async function GET() {
   const baseUrl = process.env.ESP_BASE_URL || 'http://localhost:8080';
   const url = `${baseUrl}/data.json`;
