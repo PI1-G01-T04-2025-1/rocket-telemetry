@@ -1,5 +1,5 @@
 import { prisma } from '@/lib';
-import { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
   request: NextRequest,
@@ -70,4 +70,25 @@ export async function GET(
       headers: { 'Content-Type': 'application/json' },
     },
   );
+}
+
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string; launchId: string }> },
+) {
+  const { id, launchId } = await params;
+
+  try {
+    // Remove dados coletados primeiro (por FK)
+    await prisma.colectedData.deleteMany({
+      where: { lancamentoId: Number(launchId) },
+    });
+    // Remove o lançamento
+    await prisma.launch.delete({
+      where: { id: Number(launchId) },
+    });
+    return NextResponse.json({ success: true, message: 'Lançamento removido com sucesso' });
+  } catch (error: any) {
+    return NextResponse.json({ success: false, message: 'Erro ao remover lançamento', error: error.message }, { status: 500 });
+  }
 }

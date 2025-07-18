@@ -10,6 +10,8 @@ import { useLaunchData } from '@/hooks/react-query/useLaunchData';
 import { Skeleton } from '@/components/ui/skeleton';
 import { exportToCSV } from '@/services/export';
 import { PrintView } from './PrintView';
+import { GPGPADto, convertCordinateToDecimal } from '@/lib/telemetry-calculator/utils';
+import { api } from '@/lib/http/api';
 
 export const DetailsView = () => {
   const router = useRouter();
@@ -19,26 +21,84 @@ export const DetailsView = () => {
     launchId: String(id),
   });
 
-  const altitude = [
-    { time: 0, altitude: 0 },
-    { time: 1, altitude: 5 },
-    { time: 2, altitude: 10 },
-    { time: 3, altitude: 5 },
-    { time: 4, altitude: 0 },
-  ];
+  let altitude: { time: number; altitude: number }[] = [];
+  const rawData = data?.collectedData?.rawData;
+  if (rawData) {
+    try {
+      const parsed = JSON.parse(rawData);
+      altitude = parsed.records
+        .map((rec: any, idx: number) => {
+          try {
+            const parsedG = GPGPADto(rec.g);
+            return {
+              time: Number(idx),
+              altitude: Number(parsedG.altitude),
+            };
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean) as { time: number; altitude: number }[];
+    } catch {}
+  }
 
-  const trajectoryData = [
-    { lat: -15.9894098, lon: -48.0270285 },
-    { lat: -15.9894022, lon: -48.0270245 },
-    { lat: -15.989395, lon: -48.0270205 },
-    { lat: -15.9893878, lon: -48.0270165 },
-    { lat: -15.9893805, lon: -48.0270125 },
-    { lat: -15.9893732, lon: -48.0270085 },
-    { lat: -14.9893659, lon: -48.0270045 },
-    { lat: -14.9893587, lon: -48.0270005 },
-    { lat: -15.9893514, lon: -48.0269965 },
-    { lat: -15.9893441, lon: -48.0269925 },
-  ];
+  // Monta dados reais de trajetória GPS a partir do rawData
+  let trajectoryData: { lat: number; lon: number }[] = [];
+  if (rawData) {
+    try {
+      const parsed = JSON.parse(rawData);
+      trajectoryData = parsed.records
+        .map((rec: any) => {
+          try {
+            const parsedG = GPGPADto(rec.g);
+            const lat = Number(convertCordinateToDecimal(parsedG.lat[0], parsedG.lat[1]));
+            const lon = Number(convertCordinateToDecimal(parsedG.lon[0], parsedG.lon[1]));
+            return { lat, lon };
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean) as { lat: number; lon: number }[];
+    } catch {}
+  }
+
+  // Monta dados reais de longitude ao longo do tempo
+  let longitudeData: { time: number; longitude: number }[] = [];
+  if (rawData) {
+    try {
+      const parsed = JSON.parse(rawData);
+      longitudeData = parsed.records
+        .map((rec: any, idx: number) => {
+          try {
+            const parsedG = GPGPADto(rec.g);
+            const lon = Number(convertCordinateToDecimal(parsedG.lon[0], parsedG.lon[1]));
+            return { time: Number(idx), longitude: lon };
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean) as { time: number; longitude: number }[];
+    } catch {}
+  }
+
+  // Monta dados reais de latitude ao longo do tempo
+  let latitudeData: { time: number; latitude: number }[] = [];
+  if (rawData) {
+    try {
+      const parsed = JSON.parse(rawData);
+      latitudeData = parsed.records
+        .map((rec: any, idx: number) => {
+          try {
+            const parsedG = GPGPADto(rec.g);
+            const lat = Number(convertCordinateToDecimal(parsedG.lat[0], parsedG.lat[1]));
+            return { time: Number(idx), latitude: lat };
+          } catch {
+            return null;
+          }
+        })
+        .filter(Boolean) as { time: number; latitude: number }[];
+    } catch {}
+  }
 
   const [showPrintView, setShowPrintView] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -88,7 +148,7 @@ export const DetailsView = () => {
             </Button>
           </div>
           <div className='w-full max-w-5xl mx-auto print:w-full print:max-w-full'>
-            <PrintView data={data} altitude={altitude} trajectoryData={trajectoryData} />
+            <PrintView data={data} altitude={altitude} trajectoryData={trajectoryData} latitudeData={latitudeData} longitudeData={longitudeData} />
           </div>
         </div>
       )}
@@ -147,7 +207,22 @@ export const DetailsView = () => {
                     </Button>
                   </>
                 )}
-                <Button variant='destructive' size='sm' data-exclude-print>
+                <Button
+                  variant='destructive'
+                  size='sm'
+                  data-exclude-print
+                  onClick={async () => {
+                    if (!data) return;
+                    if (!window.confirm('Tem certeza que deseja excluir este lançamento?')) return;
+                    try {
+                      await api.delete(`/rocket/${data.rocketId}/launches/${data.id}`);
+                      alert('Lançamento excluído com sucesso!');
+                      router.push('/');
+                    } catch (err: any) {
+                      alert('Erro ao excluir lançamento: ' + (err?.response?.data?.message || err.message));
+                    }
+                  }}
+                >
                   Excluir Lançamento
                 </Button>
               </div>
@@ -165,7 +240,7 @@ export const DetailsView = () => {
                 />
                 <CardSampleInfo
                   title='Distância percorrida'
-                  value={`${data?.collectedData.distance?.toFixed(2) || 0}m`}
+                  value={`${Number(data?.collectedData.distance || 0).toFixed(2)}m`}
                 />
                 <CardSampleInfo
                   title='Pressão'
@@ -173,11 +248,11 @@ export const DetailsView = () => {
                 />
                 <CardSampleInfo
                   title='Velocidade média'
-                  value={`${data?.collectedData.averageSpeed?.toFixed(2) || 0}m/s`}
+                  value={`${Number(data?.collectedData.averageSpeed || 0).toFixed(2)}m/s`}
                 />
                 <CardSampleInfo
                   title='Tempo de percurso'
-                  value={`${data?.collectedData.timeToReach || 0}s`}
+                  value={`${Number(data?.collectedData.timeToReach || 0)}s`}
                 />
                 <CardSampleInfo
                   title='Quantidade de água'
@@ -204,38 +279,50 @@ export const DetailsView = () => {
                     }}
                   />
                 </div>
+              </section>
+
+              {/* Gráfico de longitude em relação ao tempo */}
+              <section className='mt-8 grid grid-cols-12 gap-4'>
                 <div className='col-span-4'>
                   <ChartLineDots
-                    title='Trajetória GPS'
-                    description='Gráfico da trajetória GPS do lançamento 2D (latitude e longitude)'
-                    chartData={trajectoryData}
-                    dataKey='lat'
-                    xAxisDataKey='lon'
-                    yAxisDataKey='lat'
+                    title='Longitude em relação ao tempo'
+                    description='Gráfico de longitude em relação ao tempo'
+                    chartData={longitudeData}
+                    dataKey='longitude'
+                    xAxisDataKey='time'
+                    xAxisTickFormatter={(value) => Number(value).toFixed(0) + 's'}
+                    yAxisDataKey='longitude'
+                    yAxisTickFormatter={(value) => Number(value).toFixed(6)}
                     chartConfig={{
-                      lat: {
-                        color: 'var(--chart-5)',
-                        label: 'Latitude',
+                      longitude: {
+                        color: 'var(--chart-4)',
+                        label: 'Longitude',
                       },
                     }}
                   />
                 </div>
+              </section>
+
+              {/* Gráfico de latitude em relação ao tempo */}
+              <section className='mt-8 grid grid-cols-12 gap-4'>
+                <div className='col-span-4'>
                 <ChartLineDots
-                  title='Altitude em relação ao tempo'
-                  description='Gráfico de altitude em relação ao tempo'
-                  chartData={altitude}
-                  dataKey='altitude'
+                    title='Latitude em relação ao tempo'
+                    description='Gráfico de latitude em relação ao tempo'
+                    chartData={latitudeData}
+                    dataKey='latitude'
                   xAxisDataKey='time'
-                  xAxisTickFormatter={(value: number) => `${value}s`}
-                  yAxisDataKey='altitude'
-                  yAxisTickFormatter={(value: number) => `${value}m`}
+                    xAxisTickFormatter={(value) => Number(value).toFixed(0) + 's'}
+                    yAxisDataKey='latitude'
+                    yAxisTickFormatter={(value) => Number(value).toFixed(6)}
                   chartConfig={{
-                    altitude: {
+                      latitude: {
                       color: 'var(--chart-3)',
-                      label: 'Altitude',
+                        label: 'Latitude',
                     },
                   }}
                 />
+                </div>
               </section>
             </>
           )}

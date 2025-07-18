@@ -6,6 +6,8 @@ interface PrintViewProps {
   data: any;
   altitude: Array<{ time: number; altitude: number }>;
   trajectoryData: Array<{ lat: number; lon: number }>;
+  latitudeData: Array<{ time: number; latitude: number }>;
+  longitudeData: Array<{ time: number; longitude: number }>;
 }
 
 const metricCards = [
@@ -17,7 +19,7 @@ const metricCards = [
   { key: 'water', label: 'Quantidade de água', format: (v: any) => `${v || 0}ml` },
 ];
 
-export const PrintView = forwardRef<HTMLDivElement, PrintViewProps>(({ data, altitude, trajectoryData }, ref) => {
+export const PrintView = forwardRef<HTMLDivElement, PrintViewProps>(({ data, altitude, trajectoryData, latitudeData, longitudeData }, ref) => {
   return (
     <div ref={ref} className="w-full px-8 py-8 bg-white">
       <h1 className="text-4xl font-bold text-center mb-8">Relatório de Lançamento</h1>
@@ -38,9 +40,9 @@ export const PrintView = forwardRef<HTMLDivElement, PrintViewProps>(({ data, alt
           </Card>
         ))}
       </div>
-      {/* Gráficos ocupando 100% da largura */}
-      <div className="flex flex-col gap-8 w-full max-w-4xl mx-auto">
-        <div className="w-full">
+      {/* Gráficos em linha horizontal centralizada */}
+      <div className="flex flex-row gap-4 justify-center items-start w-full max-w-6xl mx-auto">
+        <div className="flex-1 min-w-0 max-w-[32%]">
           <ChartLineDots
             title="Altitude em relação ao tempo"
             description="Gráfico de altitude em relação ao tempo"
@@ -58,18 +60,38 @@ export const PrintView = forwardRef<HTMLDivElement, PrintViewProps>(({ data, alt
             }}
           />
         </div>
-        <div className="w-full">
+        <div className="flex-1 min-w-0 max-w-[32%]">
           <ChartLineDots
-            title="Trajetória GPS"
-            description="Gráfico da trajetória GPS do lançamento 2D (latitude e longitude)"
-            chartData={trajectoryData}
-            dataKey="lat"
-            xAxisDataKey="lon"
-            yAxisDataKey="lat"
+            title="Latitude em relação ao tempo"
+            description="Gráfico de latitude em relação ao tempo"
+            chartData={latitudeData}
+            dataKey="latitude"
+            xAxisDataKey="time"
+            xAxisTickFormatter={(value: number) => `${value}s`}
+            yAxisDataKey="latitude"
+            yAxisTickFormatter={(value: number) => `${value}`}
             chartConfig={{
-              lat: {
-                color: 'var(--chart-5)',
+              latitude: {
+                color: 'var(--chart-3)',
                 label: 'Latitude',
+              },
+            }}
+          />
+        </div>
+        <div className="flex-1 min-w-0 max-w-[32%]">
+          <ChartLineDots
+            title="Longitude em relação ao tempo"
+            description="Gráfico de longitude em relação ao tempo"
+            chartData={longitudeData}
+            dataKey="longitude"
+            xAxisDataKey="time"
+            xAxisTickFormatter={(value: number) => `${value}s`}
+            yAxisDataKey="longitude"
+            yAxisTickFormatter={(value: number) => `${value}`}
+            chartConfig={{
+              longitude: {
+                color: 'var(--chart-4)',
+                label: 'Longitude',
               },
             }}
           />

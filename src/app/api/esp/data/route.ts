@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 
 export async function GET() {
-  const url = 'http://localhost:8080/data.json';
+  const baseUrl = process.env.ESP_BASE_URL || 'http://localhost:8080';
+  const url = `${baseUrl}/data.json`;
 
   try {
     const res = await fetch(url);

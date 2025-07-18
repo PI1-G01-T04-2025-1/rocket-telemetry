@@ -1,7 +1,6 @@
 import axios from 'axios';
 
-// Configuração simples para desenvolvimento
-const baseUrl = 'http://localhost:3001';
+const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000';
 
 export const api = axios.create({
   baseURL: `${baseUrl}/api/v1`,

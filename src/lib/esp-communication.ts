@@ -13,11 +13,7 @@ export class ESPCommunicationService {
   private retryDelay: number;
 
   constructor(
-    // Descomente a linha abaixo para usar o IP do ESP!!!
-    baseURL: string = 'http://192.168.4.1',
-
-    // Comente a linha abaixo ao usar o IP do ESP
-    // baseURL: string = 'http://localhost:8080',
+    baseURL: string = process.env.NEXT_PUBLIC_ESP_BASE_URL || 'http://localhost:8080',
 
     maxRetries: number = 3,
     retryDelay: number = 1000,
@@ -69,7 +65,7 @@ export class ESPCommunicationService {
         // Verificar se é um erro de conexão resetada
         if (this.isConnectionResetError(axiosError)) {
           console.log(
-            `Tentativa ${attempt}: Conexão resetada pelo ESP (normal)`,
+            `Tentativa ${attempt}: Conexão resetada pelo ESP`,
           );
 
           if (attempt === this.maxRetries) {
